@@ -1,0 +1,42 @@
+services:
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    networks:
+      - thetaKonnect
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - thetaKonnect
+    depends_on:
+      - mongo #if mongo db run then backend run 
+  
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - thetaKonnect
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  thetaKonnect:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+
+# docker compose up
+    

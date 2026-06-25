@@ -3,10 +3,25 @@ import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AsyncWrap from "../utils/AsyncWrap.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
+// Cross-site cookies require Secure + SameSite=None in production (HTTPS);
+// locally over HTTP we use Lax so the browser stores and sends the cookie.
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
+function safeUser(user) {
+  return { _id: user._id, username: user.username, email: user.email };
+}
+
 const signUp = AsyncWrap(async (req, res) => {
   const { username, email, password } = req.body;
 
-  if (!username || !email || !password ) {
+  if (!username || !email || !password) {
     throw new ApiError(400, "All field require");
   }
 
@@ -18,50 +33,51 @@ const signUp = AsyncWrap(async (req, res) => {
     throw new ApiError(400, "Username or email already exsist");
   }
 
-  const createUser = await User({
-    username,
-    email
-  });
+  const user = await User.create({ username, email, password });
 
-  let user = await User.register(createUser, password);
+  const token = user.generateAccessToken();
 
-  req.login(user, (err) => {
-    if (err) {
-      throw new ApiError(400, "signup user error");
-    }
-    return res
-      .status(200)
-      .json(new ApiResponse(200, user, "Successfully login"));
-  });
+  return res
+    .status(200)
+    .cookie("token", token, cookieOptions)
+    .json(new ApiResponse(200, safeUser(user), "Successfully login"));
 });
 
 const Login = AsyncWrap(async (req, res) => {
-  if (!req.user) {
-   throw new ApiError("Invalid email or password")
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
   }
 
-  return res.status(200).json(new ApiResponse(200,  "Login successful"));
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const isMatch = await user.isPasswordCorrect(password);
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const token = user.generateAccessToken();
+
+  return res
+    .status(200)
+    .cookie("token", token, cookieOptions)
+    .json(new ApiResponse(200, safeUser(user), "Login successful"));
 });
 
-const userLogin=AsyncWrap(async(req,res)=>{
-  // console.log(req.user)
-  if(!req.isAuthenticated()){
-    throw new ApiError(400,"Plesae login first")
-  }
-  return res.status(200).json(new ApiResponse(200,"User login"))
-})
-
+const userLogin = AsyncWrap(async (req, res) => {
+  // verifyJWT guarantees req.user is set by the time we get here.
+  return res.status(200).json(new ApiResponse(200, req.user, "User login"));
+});
 
 const profileLogout = AsyncWrap(async (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      throw new ApiError(400, "Unuthrize request");
-    }
-  });
-
-  // req.session.destroy();
-
-  return res.status(200).json(new ApiResponse(200, "User logout"));
+  return res
+    .status(200)
+    .clearCookie("token", cookieOptions)
+    .json(new ApiResponse(200, "User logout"));
 });
 
-export { signUp, Login, profileLogout,userLogin };
+export { signUp, Login, profileLogout, userLogin };

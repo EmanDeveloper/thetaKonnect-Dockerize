@@ -11,7 +11,7 @@ const CreateProfile = AsyncWrap(async (req, res) => {
   // console.log("Uploaded Avatar:", avatar[0]?.filename);
   // console.log("Uploaded Cover Image:", coverImage[0]?.filename);
 
-  if (!req.isAuthenticated()) {
+  if (!req.user) {
     throw new ApiError(401, "Please log in first.");
   }
 
@@ -225,7 +225,7 @@ const DeleteProfile =AsyncWrap( async (req, res) => {
 
 
 const currentUser=AsyncWrap(async(req,res)=>{
-  if (!req.isAuthenticated()) {
+  if (!req.user) {
     throw new ApiError(401, "Please log in first.");
   }
   return res.status(200).json(new ApiResponse(200,req.user._id))

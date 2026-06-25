@@ -7,7 +7,7 @@ import {
   showProfile,
   currentUser
 } from "../controller/profile.controller.js";
-import { userLogin } from "../middleware/login.middleware.js";
+import { verifyJWT, attachUser } from "../middleware/login.middleware.js";
 import { storage } from "../utils/cloudinary.js";
 
 import multer from "multer"
@@ -17,10 +17,10 @@ const upload = multer({ storage: storage });
 const router = Router();
 
 router.route("/").get(AllProfile);
-router.route("/show/:id").get(showProfile);
-router.route("/create").post(upload.fields([{ name: 'avatar' }, { name: 'coverImage' }]),CreateProfile);
-router.route("/update/:id").put(upload.fields([{ name: "avatar" }, { name: "coverImage" }]),UpdateProfile);
-router.route("/delete/:id").delete(DeleteProfile);
-router.route("/currentUser").get(currentUser)
+router.route("/show/:id").get(attachUser, showProfile);
+router.route("/create").post(verifyJWT, upload.fields([{ name: 'avatar' }, { name: 'coverImage' }]),CreateProfile);
+router.route("/update/:id").put(verifyJWT, upload.fields([{ name: "avatar" }, { name: "coverImage" }]),UpdateProfile);
+router.route("/delete/:id").delete(verifyJWT, DeleteProfile);
+router.route("/currentUser").get(verifyJWT, currentUser)
 
 export default router;

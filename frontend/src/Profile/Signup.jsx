@@ -35,7 +35,7 @@ function Signup() {
             console.log(response);
             navigate(`/`);
         } catch (err) {
-            toast.error(err.response.data.message);
+            toast.error(err.response?.data?.message || "Something went wrong!");
         }
     }
 

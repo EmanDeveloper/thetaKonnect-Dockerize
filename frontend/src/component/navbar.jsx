@@ -12,7 +12,7 @@ function Navbar() {
 
   const checkLogin = async () => {
     try {
-    let re=await axios.get(`${import.meta.env.VITE_API_URL}/user/navLogin`);
+    let re=await axios.get(`${import.meta.env.VITE_API_URL}/user/navLogin`, { withCredentials: true });
       setIsLoggedIn(true); 
     } catch (error) {
       setIsLoggedIn(false); 

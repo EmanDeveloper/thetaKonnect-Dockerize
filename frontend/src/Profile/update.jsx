@@ -66,11 +66,6 @@ function Update() {
         formData.append(key, edit[key]);
       });
 
-      console.log("FormData contents:");
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
       // Make the PUT request
       await axios.put(
         `${import.meta.env.VITE_API_URL}/profile/update/${edit._id}`,
@@ -85,7 +80,6 @@ function Update() {
       // Set loading to false when the update completes
       setLoading(false);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to update profile.");
       
       // Set loading to false in case of error

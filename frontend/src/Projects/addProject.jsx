@@ -50,25 +50,18 @@ function AddProject() {
       formData.append("projectImage", project.projectImage);
       formData.append("projectLink", project.projectLink);
 
-      // Debugging FormData
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-
       // Send request
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL}/project/add/${profile._id}`,
         formData,
         { withCredentials: true }
       );
 
-      console.log(response);
       navigate(`/show/${profile._id}`, {
         state: { toastMessage: "New project added!" },
       });
       toast.success("Project added successfully!");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add project.");
       setLoading(false);
     }

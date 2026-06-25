@@ -3,7 +3,7 @@ import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AsyncWrap from "../utils/AsyncWrap.js";
 
-import { cloudinary } from "../utils/cloudinary.js";
+import { cloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 const CreateProfile = AsyncWrap(async (req, res) => {
   // console.log(req.files)
@@ -111,11 +111,8 @@ const UpdateProfile = AsyncWrap(async (req, res) => {
         folder: 'profiles/avatars', // specify the folder in Cloudinary
       });
 
-      // Delete the old avatar from Cloudinary if it's not the default image
-      if (profile.avatar && profile.avatar !== "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXbHGJPHKrYtYQfPEoEcKGZpTnzIElvIMWvQ&s") {
-        const avatarPublicId = profile.avatar.split('/').slice(7).join('/').split('.')[0];
-        await cloudinary.uploader.destroy(avatarPublicId);
-      }
+      // Best-effort delete of the old avatar (skipped for default/non-Cloudinary URLs).
+      await deleteFromCloudinary(profile.avatar);
       avatarUrl = avatarUpload.secure_url; // Set the new avatar URL
     } catch (error) {
       console.error("Error uploading avatar to Cloudinary:", error);
@@ -131,11 +128,8 @@ const UpdateProfile = AsyncWrap(async (req, res) => {
         folder: 'profiles/covers', // specify the folder in Cloudinary
       });
 
-      // Delete the old cover image from Cloudinary if it's not the default image
-      if (profile.coverImage && profile.coverImage !== "https://png.pngtree.com/thumb_back/fh260/background/20200217/pngtree-dark-blue-metallic-background-image_330066.jpg") {
-        const coverImagePublicId = profile.coverImage.split('/').slice(7).join('/').split('.')[0];
-        await cloudinary.uploader.destroy(coverImagePublicId);
-      }
+      // Best-effort delete of the old cover image (skipped for default/non-Cloudinary URLs).
+      await deleteFromCloudinary(profile.coverImage);
       coverImageUrl = coverImageUpload.secure_url; // Set the new cover image URL
     } catch (error) {
       console.error("Error uploading cover image to Cloudinary:", error);
@@ -197,25 +191,9 @@ const DeleteProfile =AsyncWrap( async (req, res) => {
 
     const profile = await Profile.findById(id);
 
-    if (profile.avatar && profile.avatar !== "default avatar URL") {
-      const avatarPublicId = profile.avatar.split('/').slice(7).join('/').split('.')[0]; // Extract public_id
-      try {
-        await cloudinary.uploader.destroy(avatarPublicId); // Delete avatar image
-      } catch (error) {
-        console.error("Error deleting avatar from Cloudinary:", error);
-        throw new ApiError(500, "Failed to delete avatar from Cloudinary.");
-      }
-    }
-
-    if (profile.coverImage && profile.coverImage !== "default cover image URL") {
-      const coverImagePublicId = profile.coverImage.split('/').slice(7).join('/').split('.')[0]; // Extract public_id
-      try {
-        await cloudinary.uploader.destroy(coverImagePublicId); // Delete cover image
-      } catch (error) {
-        console.error("Error deleting cover image from Cloudinary:", error);
-        throw new ApiError(500, "Failed to delete cover image from Cloudinary.");
-      }
-    }
+    // Best-effort image cleanup — never block the deletion if Cloudinary is slow/unreachable.
+    await deleteFromCloudinary(profile.avatar);
+    await deleteFromCloudinary(profile.coverImage);
 
     let deleteProfile = await Profile.findByIdAndDelete(id);
     return res

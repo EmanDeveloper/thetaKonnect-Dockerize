@@ -41,12 +41,11 @@ function Show() {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/profile/show/${profileId}`,{withCredentials:true}
         );
-        console.log("12",response.data);
         setOwner(response.data.message)
         setProfile(response.data.data);
         setProject(response.data.data.project);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch {
+        // ignore fetch error
       } finally {
         setLoading(false);
       }
@@ -60,7 +59,7 @@ function Show() {
 
   async function handelProfileDelete() {
     const profileId = profile ? profile._id : id;
-    await axios.delete(`${import.meta.env.VITE_API_URL}/profile/delete/${profileId}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/profile/delete/${profileId}`,{withCredentials:true});
     navigate("/", { state: { toastMessage: "Profile deleted!" } });
   }
 
@@ -77,12 +76,12 @@ function Show() {
   async function deleteProject() {
     try {
       const profileId = profile ? profile._id : id;
-      await axios.delete(`${import.meta.env.VITE_API_URL}/project/delete/${projectToDelete}/${profileId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/project/delete/${projectToDelete}/${profileId}`, {withCredentials:true});
       setProject(project.filter((p) => p._id !== projectToDelete)); // Remove project from state
       setDel(false);
       setProjectToDelete(null);
-    } catch (error) {
-      console.error("Error deleting project:", error);
+    } catch {
+      // ignore delete error
     }
   }
 

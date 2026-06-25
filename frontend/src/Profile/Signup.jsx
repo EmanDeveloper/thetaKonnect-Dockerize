@@ -31,8 +31,7 @@ function Signup() {
         }
 
         try {
-            let response = await axios.post(`${import.meta.env.VITE_API_URL}/user/signup`, signup,{withCredentials:true});
-            console.log(response);
+            await axios.post(`${import.meta.env.VITE_API_URL}/user/signup`, signup,{withCredentials:true});
             navigate(`/`);
         } catch (err) {
             toast.error(err.response?.data?.message || "Something went wrong!");

@@ -68,7 +68,6 @@ function Create() {
         state: { toastMessage: "Profile successfully created!" },
       });
     } catch (er) {
-      console.log(er);
       toast.error(`${er.response?.data?.message || "Something went wrong!"}`);
     } finally {
       setLoading(false); // Stop loading

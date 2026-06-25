@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import AsyncWrap from "../utils/AsyncWrap.js";
 import { Project } from "../models/project.models.js";
 import { Profile } from "../models/profile.models.js";
-import { cloudinary} from "../utils/cloudinary.js"
+import { deleteFromCloudinary } from "../utils/cloudinary.js"
 
 const addProject = AsyncWrap(async (req, res) => {
     // console.log(req.body)
@@ -47,23 +47,9 @@ const deleteProject = AsyncWrap(async (req, res) => {
     }
 
     const project = await Project.findById(projectId);
-    // console.log(project)
 
-    if (project.projectImage && project.projectImage !== "https://png.pngtree.com/thumb_back/fh260/background/20231010/pngtree-energetic-university-student-engaged-in-laptop-work-3d-illustration-image_13571920.png") {
-        // Extract public_id from Cloudinary URL
-        const imageUrl = project.projectImage;
-        const publicId = imageUrl.split('/').slice(7).join('/').split('.')[0]; // Extract public_id from URL
-        
-        // console.log("Deleting image with public_id:", publicId);
-
-        try {
-            // Delete image from Cloudinary
-            await cloudinary.uploader.destroy(publicId);
-        } catch (error) {
-            console.error("Error deleting image from Cloudinary:", error);
-            throw new ApiError(500, "Failed to delete the image from Cloudinary.");
-        }
-    }
+    // Best-effort image cleanup — never block the deletion if Cloudinary is slow/unreachable.
+    await deleteFromCloudinary(project.projectImage);
 
     await Project.findByIdAndDelete(projectId);
     await Profile.findByIdAndUpdate(profileId,

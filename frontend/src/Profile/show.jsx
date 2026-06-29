@@ -4,7 +4,6 @@ import axios from "axios";
 import { FaGithub, FaLinkedin, FaPlus } from "react-icons/fa";
 import { GiCrossedBones } from "react-icons/gi";
 import { MdDelete } from "react-icons/md";
-import React from 'react';
 import { AnimatedBackground } from 'animated-backgrounds';
 import AOS from "aos";
 import "aos/dist/aos.css";

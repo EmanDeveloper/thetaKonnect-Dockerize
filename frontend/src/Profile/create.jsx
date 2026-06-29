@@ -3,7 +3,6 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import React from "react";
 import { AnimatedBackground } from "animated-backgrounds";
 import loadingimg from "../assets/loadin.png";
 

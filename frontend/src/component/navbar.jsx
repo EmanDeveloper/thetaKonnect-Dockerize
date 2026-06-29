@@ -12,9 +12,9 @@ function Navbar() {
 
   const checkLogin = async () => {
     try {
-    let re=await axios.get(`${import.meta.env.VITE_API_URL}/user/navLogin`, { withCredentials: true });
-      setIsLoggedIn(true); 
-    } catch (error) {
+    await axios.get(`${import.meta.env.VITE_API_URL}/user/navLogin`, { withCredentials: true });
+      setIsLoggedIn(true);
+    } catch {
       setIsLoggedIn(false); 
     }
   };
@@ -25,7 +25,7 @@ function Navbar() {
       setIsLoggedIn(false);
       toast.success("Logged out successfully");
       navigate("/",{ replace: true } )
-    } catch (error) {
+    } catch {
       toast.error("Failed to logout");
     }
   };

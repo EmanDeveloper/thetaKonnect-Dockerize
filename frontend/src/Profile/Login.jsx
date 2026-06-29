@@ -3,7 +3,6 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import React from "react";
 import { AnimatedBackground } from "animated-backgrounds";
 
 function Login() {
@@ -36,7 +35,7 @@ function Login() {
         { withCredentials: true }
       );
       navigate(`/`, { state: { toastMessage: "User login successfully!" } });
-    } catch (err) {
+    } catch {
       toast.error("Email or password incorrect");
     }
   }

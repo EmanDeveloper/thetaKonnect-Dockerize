@@ -15,7 +15,7 @@ import AddProject from "./Projects/addProject";
 
 
 const darkTheme = createTheme({
-  palette: {
+  palette: 
     mode: 'dark',
   },
 });

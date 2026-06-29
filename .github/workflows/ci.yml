@@ -1,0 +1,29 @@
+
+name: ci
+
+on:
+  push: #when we push to main branch, this workflow will run
+    branches: [ "main" ]
+  pull_request: #when we open pull request to main branch, this workflow will run
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest # the machine on github actions will run the workflow on
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4 #its tell git hub to checkout the current branch so that we can run the workflow on it
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4 #its tell github to setup node.js on the machine so that we can run the workflow on it
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test

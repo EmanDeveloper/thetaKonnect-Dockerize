@@ -10,7 +10,6 @@ import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 import Avatar from "@mui/material/Avatar";
 import toast, { Toaster } from "react-hot-toast";
-import React from 'react';
 import { AnimatedBackground } from 'animated-backgrounds';
 
 

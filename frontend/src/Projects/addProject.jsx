@@ -61,7 +61,7 @@ function AddProject() {
         state: { toastMessage: "New project added!" },
       });
       toast.success("Project added successfully!");
-    } catch (err) {
+    } catch {
       toast.error("Failed to add project.");
       setLoading(false);
     }

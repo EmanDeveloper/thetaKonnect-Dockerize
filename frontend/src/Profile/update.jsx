@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import toast, { Toaster } from "react-hot-toast";
@@ -79,7 +79,7 @@ function Update() {
 
       // Set loading to false when the update completes
       setLoading(false);
-    } catch (err) {
+    } catch {
       toast.error("Failed to update profile.");
       
       // Set loading to false in case of error

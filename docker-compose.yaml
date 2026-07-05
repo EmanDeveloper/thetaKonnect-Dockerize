@@ -18,7 +18,7 @@ services:
     networks:
       - thetaKonnect
     depends_on:
-      - mongo #if mongo db run then backend run 
+      - mongo 
   
   mongo:
     image: mongo:latest
@@ -38,5 +38,5 @@ volumes:
   mongo-data:
     driver: local
 
-# docker compose up
+
     
